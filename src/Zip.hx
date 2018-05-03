@@ -1,5 +1,6 @@
 package;
 
+import gml.NativeString;
 import gml.ds.ArrayList;
 import gml.io.Buffer;
 
@@ -73,10 +74,9 @@ class Zip {
 		if (!open) throw "Zip writer is already finalized.";
 		var compress = this.compressionLevel != 0;
 		var o = this.buffer;
-		var flags = 0;
 		o.writeInt(0x04034B50);
 		o.writeShort(0x0014); // version
-		o.writeShort(flags); // flags
+		o.writeShort(0x800); // flags = UTF8
 		o.writeShort(compress ? 8 : 0);
 		//
 		var time = Date.now();
@@ -97,7 +97,7 @@ class Zip {
 		o.writeIntUnsigned(crc);
 		o.writeInt(clen);
 		o.writeInt(len);
-		o.writeShort(path.length);
+		o.writeShort(NativeString.byteLength(path));
 		o.writeShort(0);
 		o.writeChars(path);
 		var file:ZipEntry = {
@@ -131,12 +131,12 @@ class Zip {
 		var cdr_size = 0;
 		var cdr_offset = 0;
 		for ( f in files ) {
-			var namelen = f.name.length;
+			var namelen = NativeString.byteLength(f.name);
 			var extraFieldsLength = 0;
 			o.writeInt(0x02014B50); // header
 			o.writeShort(0x0014); // version made-by
 			o.writeShort(0x0014); // version
-			o.writeShort(0); // flags
+			o.writeShort(0x800); // flags = UTF8
 			o.writeShort(f.compressed?8:0);
 			writeZipDate(o, f.date);
 			o.writeIntUnsigned(f.crc);

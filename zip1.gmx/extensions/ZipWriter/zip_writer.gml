@@ -53,10 +53,9 @@ var this = argument[0], path1 = argument[1], buf = argument[2], pos = argument[3
 if (!this[2/* open */]) show_error("Zip writer is already finalized.", false);
 var compress = this[3/* compression_level */] != 0;
 var o = this[0/* buffer */];
-var flags = 0;
 buffer_write(o, 6, 67324752);
 buffer_write(o, 3, 20);
-buffer_write(o, 3, flags);
+buffer_write(o, 3, 2048);
 buffer_write(o, 3, (compress) ? 8 : 0);
 var time = date_current_datetime();
 buffer_write(o, 3, (((date_get_hour(time) << 11) | (date_get_minute(time) << 5)) | (date_get_second(time) >> 1)));
@@ -71,7 +70,7 @@ if (compress) {
 buffer_write(o, 5, crc);
 buffer_write(o, 6, clen);
 buffer_write(o, 6, len);
-buffer_write(o, 3, string_length(path1));
+buffer_write(o, 3, string_byte_length(path1));
 buffer_write(o, 3, 0);
 buffer_write(o, 13, path1);
 var file = [/* name: */path1, /* compressed: */compress, /* clen: */clen, /* size: */len, /* crc: */crc, /* date: */time];
@@ -104,12 +103,12 @@ var _g_list = this[1/* files */];
 var _g_index = 0;
 while (_g_index < ds_list_size(_g_list)) {
 	var f = _g_list[|_g_index++];
-	var namelen = string_length(f[0/* name */]);
+	var namelen = string_byte_length(f[0/* name */]);
 	var extraFieldsLength = 0;
 	buffer_write(o, 6, 33639248);
 	buffer_write(o, 3, 20);
 	buffer_write(o, 3, 20);
-	buffer_write(o, 3, 0);
+	buffer_write(o, 3, 2048);
 	buffer_write(o, 3, (f[1/* compressed */]) ? 8 : 0);
 	var d = f[5/* date */];
 	buffer_write(o, 3, (((date_get_hour(d) << 11) | (date_get_minute(d) << 5)) | (date_get_second(d) >> 1)));
