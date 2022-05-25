@@ -33,6 +33,11 @@ class Zip {
 		open = false;
 	}
 	
+	#if sfgml.modern
+	public static inline function crc32(buf:Buffer, pos:Int, len:Int):Int {
+		return (untyped buffer_crc32)(buf, pos, len);
+	}
+	#else
 	@:native("impl_crc32")
 	public static function crc32(buf:Buffer, pos:Int, len:Int):Int {
 		var init = 0xFFFFFFFF;
@@ -49,6 +54,7 @@ class Zip {
 		}
 		return (crc ^ init) >>> 0;
 	}
+	#end
 	
 	inline function writeZipDate(o:Buffer, d:Date) {
 		o.writeShort((d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1));
@@ -70,9 +76,20 @@ class Zip {
 		dst.position = dstNext;
 	}
 	
-	@:keep @:doc public function addBufferExt(path:String, buf:Buffer, pos:Int, len:Int) {
+	static function adler32(buf:Buffer, pos:Int, len:Int):Int {
+		var a1 = 1, a2 = 0;
+		for( p in pos...pos + len ) {
+			var c = buf.peekByte(pos);
+			a1 = (a1 + c) % 65521;
+			a2 = (a2 + a1) % 65521;
+		}
+		return (a2 << 16) | a1;
+	}
+	
+	@:keep @:doc public function addBufferExt(path:String, buf:Buffer, pos:Int, len:Int, ?compressionLevel:Int) {
 		if (!open) throw "Zip writer is already finalized.";
-		var compress = this.compressionLevel != 0;
+		if (compressionLevel == null) compressionLevel = this.compressionLevel;
+		var compress = compressionLevel != 0;
 		var o = this.buffer;
 		o.writeInt(0x04034B50);
 		o.writeShort(0x0014); // version
@@ -90,9 +107,10 @@ class Zip {
 			cbuf = buf.compress(pos, len);
 			clen = cbuf.length - 6;
 			#else
-			cbuf = SfTools.raw("buffer_deflate")(buf, pos, len, this.compressionLevel);
+			cbuf = SfTools.raw("buffer_deflate")(buf, pos, len, compressionLevel);
 			clen = cbuf.position - 6;
 			#end
+			//trace(cbuf.peekInt(cbuf.length - 4), adler32(cbuf, 2, cbuf.length - 6));
 		}
 		o.writeIntUnsigned(crc);
 		o.writeInt(clen);
@@ -109,19 +127,20 @@ class Zip {
 			date : time,
 		};
 		if (compress) {
+			//trace(cbuf.peekShort(0));
 			addBufferImpl(o, cbuf, 2, clen);
 			cbuf.destroy();
 		} else addBufferImpl(o, buf, pos, len);
 		files.add(file);
 	}
 	
-	@:keep @:doc public function addBuffer(path:String, buf:Buffer) {
-		addBufferExt(path, buf, 0, buf.length);
+	@:keep @:doc public function addBuffer(path:String, buf:Buffer, ?compressionLevel:Int) {
+		addBufferExt(path, buf, 0, buf.length, compressionLevel);
 	}
 	
-	@:keep @:doc public function addFile(path:String, filePath:String) {
+	@:keep @:doc public function addFile(path:String, filePath:String, ?compressionLevel:Int) {
 		var buf = Buffer.load(filePath);
-		addBufferExt(path, buf, 0, buf.length);
+		addBufferExt(path, buf, 0, buf.length, compressionLevel);
 		buf.destroy();
 	}
 	

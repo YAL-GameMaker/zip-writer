@@ -46,6 +46,31 @@
       <ProxyFiles/>
       <functions>
         <function>
+          <name>zip_std_Date_now</name>
+          <externalName>zip_std_Date_now</externalName>
+          <kind>11</kind>
+          <help></help>
+          <returnType>2</returnType>
+          <argCount>0</argCount>
+          <args/>
+        </function>
+        <function>
+          <name>zip_std_Date_create</name>
+          <externalName>zip_std_Date_create</externalName>
+          <kind>11</kind>
+          <help></help>
+          <returnType>2</returnType>
+          <argCount>6</argCount>
+          <args>
+            <arg>2</arg>
+            <arg>2</arg>
+            <arg>2</arg>
+            <arg>2</arg>
+            <arg>2</arg>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
           <name>zip_impl_crc32</name>
           <externalName>zip_impl_crc32</externalName>
           <kind>11</kind>
@@ -76,7 +101,7 @@
           <name>zip_create</name>
           <externalName>zip_create</externalName>
           <kind>11</kind>
-          <help>zip_create(compressionLevel:int = -1)</help>
+          <help>zip_create(compressionLevel:int = -1)-&gt;zip</help>
           <returnType>2</returnType>
           <argCount>-1</argCount>
           <args/>
@@ -96,42 +121,28 @@
           <name>zip_add_buffer_ext</name>
           <externalName>zip_add_buffer_ext</externalName>
           <kind>11</kind>
-          <help>zip_add_buffer_ext(this:zip, path:string, buf:buffer, pos:int, len:int)</help>
+          <help>zip_add_buffer_ext(this:zip, path:string, buf:buffer, pos:int, len:int, ?compressionLevel:int)</help>
           <returnType>2</returnType>
-          <argCount>5</argCount>
-          <args>
-            <arg>2</arg>
-            <arg>2</arg>
-            <arg>2</arg>
-            <arg>2</arg>
-            <arg>2</arg>
-          </args>
+          <argCount>-1</argCount>
+          <args/>
         </function>
         <function>
           <name>zip_add_buffer</name>
           <externalName>zip_add_buffer</externalName>
           <kind>11</kind>
-          <help>zip_add_buffer(this:zip, path:string, buf:buffer)</help>
+          <help>zip_add_buffer(this:zip, path:string, buf:buffer, ?compressionLevel:int)</help>
           <returnType>2</returnType>
-          <argCount>3</argCount>
-          <args>
-            <arg>2</arg>
-            <arg>2</arg>
-            <arg>2</arg>
-          </args>
+          <argCount>-1</argCount>
+          <args/>
         </function>
         <function>
           <name>zip_add_file</name>
           <externalName>zip_add_file</externalName>
           <kind>11</kind>
-          <help>zip_add_file(this:zip, path:string, filePath:string)</help>
+          <help>zip_add_file(this:zip, path:string, filePath:string, ?compressionLevel:int)</help>
           <returnType>2</returnType>
-          <argCount>3</argCount>
-          <args>
-            <arg>2</arg>
-            <arg>2</arg>
-            <arg>2</arg>
-          </args>
+          <argCount>-1</argCount>
+          <args/>
         </function>
         <function>
           <name>zip_finalize</name>
@@ -148,7 +159,7 @@
           <name>zip_save</name>
           <externalName>zip_save</externalName>
           <kind>11</kind>
-          <help>zip_save(this:zip, path:string) : Finalizes and saves the contents of this ZIP to given file</help>
+          <help>zip_save(this:zip, path:string)// Finalizes and saves the contents of this ZIP to given file</help>
           <returnType>2</returnType>
           <argCount>2</argCount>
           <args>
@@ -160,10 +171,22 @@
           <name>zip_get_buffer</name>
           <externalName>zip_get_buffer</externalName>
           <kind>11</kind>
-          <help>zip_get_buffer(this:zip)-&gt;buffer : Finalizes and returns this ZIP's buffer (note: destroyed by zip_destroy - make a copy)</help>
+          <help>zip_get_buffer(this:zip)-&gt;buffer// Finalizes and returns this ZIP's buffer (note: destroyed by zip_destroy - make a copy)</help>
           <returnType>2</returnType>
           <argCount>1</argCount>
           <args>
+            <arg>2</arg>
+          </args>
+        </function>
+        <function>
+          <name>zip_std_haxe_class_create</name>
+          <externalName>zip_std_haxe_class_create</externalName>
+          <kind>11</kind>
+          <help></help>
+          <returnType>2</returnType>
+          <argCount>2</argCount>
+          <args>
+            <arg>2</arg>
             <arg>2</arg>
           </args>
         </function>
