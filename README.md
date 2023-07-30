@@ -2,6 +2,8 @@
 
 **Quick links:** [itch.io page](https://yellowafterlife.itch.io/gamemaker-zip)
 
+**Note:** This extension is superseded by [built-in functions](https://manual.yoyogames.com/#rhsearch=Strings&t=GameMaker_Language%2FGML_Reference%2FFile_Handling%2FEncoding_And_Hashing%2Fzip_create.htm) in GM2023.6+
+
 An adaptation of Haxe's standard library zip writer for use with GameMaker.
 
 GMS2 version uses the buffer_compress function and is pure-GML (so should work on all platforms).  
@@ -25,6 +27,6 @@ GMS1 version requires my free buffer_zlib extension.
 - **zip_save(zip, path)**  
   Finalizes the Zip structure (meaning that no new files can be written to it) and saves the archive to the given path.
 - **zip_get_buffer(zip)**  
-  Finalizes the Zip structure and returns it's internal buffer.  
+  Finalizes the Zip structure and returns its internal buffer.  
   Current size will be indicated by the buffer's writing position (buffer_tell).  
   Note that the buffer will be destroyed by zip_destroy.
