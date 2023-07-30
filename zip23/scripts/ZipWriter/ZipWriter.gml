@@ -1,19 +1,12 @@
 /// @lint nullToAny true
 // Feather disable all
 globalvar mq_zip_std_Date;mq_zip_std_Date=[undefined,undefined];
-globalvar mq_zip_std_haxe_Exception;mq_zip_std_haxe_Exception=[undefined,undefined];
-globalvar mq_zip_std_haxe_ValueException;mq_zip_std_haxe_ValueException=[undefined,undefined,undefined];
 globalvar zip_std_haxe_type_markerValue;zip_std_haxe_type_markerValue=[];
 globalvar mt_zip_std_Date;
 globalvar mt_zip_std_haxe_class;
-globalvar mt_zip_std_haxe_Exception;
-globalvar mt_zip_std_haxe_ValueException;
 (function(){
 mt_zip_std_Date=new zip_std_haxe_class(7,"zip_std_Date");
 mt_zip_std_haxe_class=new zip_std_haxe_class(-1,"zip_std_haxe_class");
-mt_zip_std_haxe_Exception=new zip_std_haxe_class(8,"zip_std_haxe_Exception");
-mt_zip_std_haxe_ValueException=new zip_std_haxe_class(9,"zip_std_haxe_ValueException");
-mt_zip_std_haxe_ValueException.superClass=mt_zip_std_haxe_Exception;
 })();
 
 function zip_std_Date_create(_year,_month,_day,_hour,_min1,_sec){
@@ -35,6 +28,7 @@ function zip_std_Date_now(){
 function zip_create(_compressionLevel){
 	/// zip_create(compressionLevel:int = -1)
 	/// @param {int} [compressionLevel=-1]
+	/// @returns {zip}
 	var _this=array_create(4);
 	/// @typedef {tuple<buffer:buffer,files:ds_list<ZipEntry>,open:bool,compression_level:int>} zip
 	if(_compressionLevel==undefined)_compressionLevel=-1;
@@ -52,10 +46,9 @@ function zip_impl_write(_dst,_src,_srcPos,_srcLen){
 	var _dstNext=_dstPos+_srcLen;
 	var _dstSize=buffer_get_size(_dst);
 	if(_dstNext>_dstSize){
-		while(true){
+		do {
 			_dstSize*=2;
-			if(_dstNext<=_dstSize)break;
-		}
+		} until(_dstNext<=_dstSize);
 		buffer_resize(_dst,_dstSize);
 	}
 	buffer_copy(_src,_srcPos,_srcLen,_dst,_dstPos);
@@ -65,6 +58,7 @@ function zip_impl_write(_dst,_src,_srcPos,_srcLen){
 function zip_destroy(_this){
 	/// zip_destroy(this:zip)
 	/// @param {zip} this
+	/// @returns {void}
 	buffer_delete(_this[0]);
 	_this[@0]=-1;
 	ds_list_destroy(_this[1]);
@@ -80,8 +74,9 @@ function zip_add_buffer_ext(_this,_path1,_buf,_pos,_len,_compressionLevel){
 	/// @param {int} pos
 	/// @param {int} len
 	/// @param {int} ?compressionLevel
+	/// @returns {void}
 	if(false)show_debug_message(argument[4]);
-	if(!_this[2])throw zip_std_haxe_Exception_thrown("Zip writer is already finalized.");
+	if(!_this[2])show_error("Zip writer is already finalized.",true);
 	if(_compressionLevel==undefined)_compressionLevel=_this[3];
 	var _compress=_compressionLevel!=0;
 	var _o=_this[0];
@@ -92,7 +87,7 @@ function zip_add_buffer_ext(_this,_path1,_buf,_pos,_len,_compressionLevel){
 	var _time=zip_std_Date_now();
 	buffer_write(_o,buffer_u16,(((date_get_hour(_time[1])<<11)|(date_get_minute(_time[1])<<5))|(date_get_second(_time[1])>>1)));
 	buffer_write(_o,buffer_u16,(((date_get_year(_time[1])-1980<<9)|(date_get_month(_time[1])-1+1<<5))|date_get_weekday(_time[1])));
-	var _crc=buffer_crc32(_buf,_pos,_len);
+	var _crc=(buffer_crc32(_buf,_pos,_len)^0xFFFFFFFF);
 	var _cbuf=undefined;
 	var _clen=_len;
 	if(_compress){
@@ -119,6 +114,7 @@ function zip_add_buffer(_this,_path1,_buf,_compressionLevel){
 	/// @param {string} path
 	/// @param {buffer} buf
 	/// @param {int} ?compressionLevel
+	/// @returns {void}
 	if(false)show_debug_message(argument[2]);
 	zip_add_buffer_ext(_this,_path1,_buf,0,buffer_get_size(_buf),_compressionLevel);
 }
@@ -129,6 +125,7 @@ function zip_add_file(_this,_path1,_filePath,_compressionLevel){
 	/// @param {string} path
 	/// @param {string} filePath
 	/// @param {int} ?compressionLevel
+	/// @returns {void}
 	if(false)show_debug_message(argument[2]);
 	var _buf=buffer_load(_filePath);
 	zip_add_buffer_ext(_this,_path1,_buf,0,buffer_get_size(_buf),_compressionLevel);
@@ -183,6 +180,7 @@ function zip_save(_this,_path1){
 	/// zip_save(this:zip, path:string)
 	/// @param {zip} this
 	/// @param {string} path
+	/// @returns {void}
 	if(_this[2])zip_finalize(_this);
 	buffer_save_ext(_this[0],_path1,0,buffer_tell(_this[0]));
 }
@@ -190,6 +188,7 @@ function zip_save(_this,_path1){
 function zip_get_buffer(_this){
 	/// zip_get_buffer(this:zip)->buffer
 	/// @param {zip} this
+	/// @returns {buffer}
 	if(_this[2])zip_finalize(_this);
 	return _this[0];
 }
@@ -205,57 +204,6 @@ function zip_std_haxe_class(_id,_name)constructor{
 	self.index=_id;
 	self.name=_name;
 	static __class__="class";
-}
-
-function zip_std_haxe_Exception_new(_this,_message,_previous,_native){
-	// zip_std_haxe_Exception_new(this:zip_std_haxe_Exception, message:string, ?previous:zip_std_haxe_Exception, ?native:any)
-	if(false)show_debug_message(argument[2]);
-	_this[@1]=(_native!=undefined?_native:_this);
-}
-
-function zip_std_haxe_Exception_create(_message,_previous,_native){
-	// zip_std_haxe_Exception_create(message:string, ?previous:zip_std_haxe_Exception, ?native:any)
-	var _this=[mt_zip_std_haxe_Exception];
-	array_copy(_this,1,mq_zip_std_haxe_Exception,1,1);
-	/// @typedef {tuple<any,native:any>} zip_std_haxe_Exception
-	switch(argument_count){
-		case 1:zip_std_haxe_Exception_new(_this,argument[0]);break;
-		case 2:zip_std_haxe_Exception_new(_this,argument[0],argument[1]);break;
-		case 3:zip_std_haxe_Exception_new(_this,argument[0],argument[1],argument[2]);break;
-		default:show_error("Expected 1..3 arguments.",true);
-	}
-	return _this;
-}
-
-function zip_std_haxe_Exception_isNativeException(_value){
-	// zip_std_haxe_Exception_isNativeException(value:any)->bool
-	if(is_struct(_value)){
-		var _c=variable_struct_get(_value,"__class__");
-		if(_c==undefined)return false;
-		if(_c==mt_zip_std_haxe_Exception)return true;
-		if(!variable_struct_exists(_value,"superClass"))return false;
-		for(_c=_c.superClass;is_struct(_c);_c=_c.superClass){
-			if(_c==mt_zip_std_haxe_Exception)return true;
-		}
-	}
-	return false;
-}
-
-function zip_std_haxe_Exception_thrown(_value){
-	// zip_std_haxe_Exception_thrown(value:any)->any
-	if(zip_std_haxe_Exception_isNativeException(_value))return _value[1];
-	return zip_std_haxe_ValueException_create(_value);
-}
-
-function zip_std_haxe_ValueException_create(_value,_previous,_native){
-	// zip_std_haxe_ValueException_create(value:any, ?previous:zip_std_haxe_Exception, ?native:any)
-	var _this=[mt_zip_std_haxe_ValueException];
-	array_copy(_this,1,mq_zip_std_haxe_ValueException,1,2);
-	/// @typedef {tuple<any,native:any,value:any>} zip_std_haxe_ValueException
-	if(false)show_debug_message(argument[2]);
-	zip_std_haxe_Exception_new(_this,string(_value),_previous,_native);
-	_this[@2]=_value;
-	return _this;
 }
 
 

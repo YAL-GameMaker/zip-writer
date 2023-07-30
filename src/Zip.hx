@@ -35,7 +35,7 @@ class Zip {
 	
 	#if sfgml.modern
 	public static inline function crc32(buf:Buffer, pos:Int, len:Int):Int {
-		return (untyped buffer_crc32)(buf, pos, len);
+		return buf.crc32(pos, len) ^ gml.Syntax.code("0xFFFFFFFF");
 	}
 	#else
 	@:native("impl_crc32")
@@ -87,7 +87,7 @@ class Zip {
 	}
 	
 	@:keep @:doc public function addBufferExt(path:String, buf:Buffer, pos:Int, len:Int, ?compressionLevel:Int) {
-		if (!open) throw "Zip writer is already finalized.";
+		if (!open) gml.Lib.error("Zip writer is already finalized.", true);
 		if (compressionLevel == null) compressionLevel = this.compressionLevel;
 		var compress = compressionLevel != 0;
 		var o = this.buffer;
